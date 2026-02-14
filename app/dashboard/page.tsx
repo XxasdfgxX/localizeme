@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { DashboardClient } from "@/components/dashboard-client";
 import { getAuthSession } from "@/lib/session";
 import { sql } from "@/lib/db";
@@ -19,7 +20,11 @@ export default async function DashboardPage() {
     ORDER BY created_at DESC;
   `) as ShareLink[];
 
-  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const headerStore = headers();
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const protocol = headerStore.get("x-forwarded-proto") ?? "http";
+  const detectedBaseUrl = host ? `${protocol}://${host}` : "http://localhost:3000";
+  const baseUrl = process.env.NEXTAUTH_URL ?? detectedBaseUrl;
 
   return (
     <main className="container">
