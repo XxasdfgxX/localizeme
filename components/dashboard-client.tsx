@@ -23,13 +23,14 @@ export function DashboardClient({ initialLinks, baseUrl }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const runtimeOrigin = typeof window !== "undefined" ? window.location.origin : baseUrl;
 
   const generatedUrl = useMemo(() => {
     if (!slug) {
       return "";
     }
-    return `${baseUrl}/go/${slug}`;
-  }, [baseUrl, slug]);
+    return `${runtimeOrigin}/go/${slug}`;
+  }, [runtimeOrigin, slug]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,7 +61,8 @@ export function DashboardClient({ initialLinks, baseUrl }: Props) {
   }
 
   async function copyLinkUrl(linkSlug: string) {
-    const url = `${baseUrl}/go/${linkSlug}`;
+    const origin = typeof window !== "undefined" ? window.location.origin : baseUrl;
+    const url = `${origin}/go/${linkSlug}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopiedSlug(linkSlug);
